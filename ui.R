@@ -9,9 +9,6 @@ library(shiny)
 
 shinyUI(fluidPage( theme = "bootstrap.css",
 
-  # Application title
-#  titlePanel("Price Your Diamond"),
-
   # Sidebar with a slider input for number of bins
   sidebarLayout(
     sidebarPanel(
@@ -56,13 +53,11 @@ shinyUI(fluidPage( theme = "bootstrap.css",
                     step = 1,
                     format = "##",
                     value = 57)
-        
-
     ),
     
     # Show a plot of the generated distribution
+    
     mainPanel(
-#        includeCSS("bootstrap.css"),
         div(
             h3("What is the Estimated Price of This Diamond ?"),
             div(),
@@ -103,7 +98,8 @@ shinyUI(fluidPage( theme = "bootstrap.css",
             transparent and completely colorless (GIA grade D) and most
             expensive. GIA grades D-F are considered colorless, whereas 
             grades G-J are near colorless. GIA grade K-M fall under the 
-            'faint yellow' group.")
+            'faint yellow' group. The Color scale is shown below:"),
+            p("D (best) > E > F > G > H > I > J (worst)  ")            
             ),
         div(
             h5("Clarity"),
@@ -129,7 +125,6 @@ shinyUI(fluidPage( theme = "bootstrap.css",
             considered Poor.")
           ),
         div()
-    
     )
   )
 ))
