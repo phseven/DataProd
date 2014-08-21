@@ -10,7 +10,8 @@ library(shiny)
 
 shinyUI(fluidPage( theme = "bootstrap.css",
 
-  # Sidebar with a slider input for number of bins
+  # Show sidebar panel with multiple controls.
+  
   sidebarLayout(
     sidebarPanel(
         img(src = "Diamond.jpg", width = "221px", height = "140px"),
@@ -56,7 +57,7 @@ shinyUI(fluidPage( theme = "bootstrap.css",
                     value = 57)
     ),
     
-    # Show a plot of the generated distribution
+    # Show main panel and display predicted value of diamond.
     
     mainPanel(
         div(
