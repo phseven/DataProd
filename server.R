@@ -1,9 +1,11 @@
 
-# This is the server logic for a Shiny web application.
+# Server logic for a Shiny web application to estimate diamond price.
 # You can find out more about building applications with Shiny here:
 #
 # http://shiny.rstudio.com
 #
+
+# --- Do basic Setup first -------
 
 # -- clean start
 
@@ -23,6 +25,10 @@ require(randomForest)
 # Copy diamonds to a data table.
 
 dia <- as.data.table(diamonds)
+
+# --- End of Setup ----------
+
+# --- Define the necessary functions ---
 
 # prcRange datatable to convert price range code to text.
 # Price range a : < 1000, b : [1000, 2000), c: [2000, 3000],
@@ -76,8 +82,9 @@ getModel <- function() {
     trainPrice <- price[inTrain]
     testPrice <- price[-inTrain]
     
-    # Specify training control parameters: cv = cross validation
-    # number = 3 (number of folds).
+    # Autotuning mtry parameter using k-fold cross validation is taking
+    # inordinately long for k = 10. Manually cross validated, and mtry = 6
+    # gives > 90% accuracy in test set, so will run with it.
     
     fitCtl <- trainControl(method = "none", classProbs = TRUE)
     
@@ -88,30 +95,18 @@ getModel <- function() {
                  trControl = fitCtl,
                  tuneGrid = data.frame(mtry = 6),    
                  verbose = FALSE )
+
+    # Predict price for test data to get confusion matrix.
     
     predPrice <- predict(fit, newdata=testdt)
     confusionMatrix(predPrice, testPrice)
     tt <- data.table(predPrice, testPrice)
     
     return(fit)
-}
+}			
 
-# First try to load model from file. 
+# ---  End function getModel() ----
 
-if(file.exists("diamonds_rf.fit") ) {
-    
-    # Load model fit.
-    
-    load("diamonds_rf.fit")
-    
-}
-    
-# if fit model is still not available, create it. This may take a while.
-    
-if( ! exists("fit")) {
-    fit <- getModel() 
-}
-    
 # Function takes a model and a set of predictors and estimates price.
 
 predictPrice <- function(fit, carat1, cut1, color1, clarity1, 
@@ -140,9 +135,37 @@ predictPrice <- function(fit, carat1, cut1, color1, clarity1,
     # Convert the price code to the explanatory text.
     
     prcRange[predCd][,txt]
-}
 
-# Reactive part related to shiny server.
+} 		
+
+# ---  End function predictPrice() ----
+
+
+# --- End defining all the necessary functions ----
+
+
+# --- Main code starts here ---------
+
+# This code is nonreactive and is executed once at application start.
+
+# First try to load model from file. 
+
+if(file.exists("diamonds_rf.fit") ) {
+    
+    # Load model fit.
+    
+    load("diamonds_rf.fit")
+    
+}
+    
+# if fit model is still not available, create it. This may take a while.
+    
+if( ! exists("fit")) {
+    fit <- getModel() 
+}
+    
+
+# Reactive part of the code related to shiny server.
 
 library(shiny)
 
